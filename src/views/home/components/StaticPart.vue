@@ -1,44 +1,112 @@
 <template>
     <div class="body">
+
         <!-- 静态组件区域（分类组件） -->
-        <div class="phoneStatus"></div>
+        <!-- <div class="phoneStatus"></div> -->
+        <van-notice-bar scrollable mode="closeable" :text="oneWord" color="#1989fa" background="#ecf9ff" class="notice"
+            v-if="noticeShow" />
+
         <div class="address">
             <img src="@/assets/addr.png" alt="" class="addr-btn">
             <span> {{ addr }}</span>
             <img src="@/assets/ben.png" alt="">
         </div>
-        <label class="search-box">
+        <label :class="['search-box', {'search-active': searchAttch}]">
             <img src="@/assets/search.png" alt="">
-            <input type="text" :placeholder="placeholder" class="search">
+            <input type="text" :placeholder="placeholder" class="search" @click="enterSearch">
         </label>
+
         <div class="swiper">
-            <img src="@/assets/swiper1.png" alt="">
+            <van-swipe style="height: 0.87rem;" indicator-color="white" :autoplay="2500" lazy-render vertical>
+                <van-swipe-item v-for="(v, k) in carouselImgs" :key="k"> <img :src="v" alt="">
+                </van-swipe-item>
+                <template #indicator="{ active, total }">
+                    <div class="custom-indicator">{{ active + 1 }}/{{ total }}</div>
+                </template>
+            </van-swipe>
+
         </div>
         <div class="shop-list">
             <div v-for="(item, index) in shopList" :key="index" class="shop-item">
-                <img src="@/assets/shop1.png" :alt="item.alt">
-                <div>{{item.name}}</div>
+                <img :src="item.imgUrl" :alt="item.imgName">
+                <div>{{item.desc}}</div>
             </div>
         </div>
 
+        <div class="block"></div>
     </div>
 </template>
 
-<script setup>
-import { ref, reactive } from 'vue'
-let addr =ref('北京理工大学国防科技园2号类10层')
-let placeholder = ref('山姆会员商铺店铺优惠品')
+<script setup >
+import { ref, reactive, toRef, defineProps } from 'vue'
+import { useRouter } from 'vue-router'
+import { HttpReq } from '@/tool/request'
+import { throttleFunc } from '@/tool/ty'
 
+let router = useRouter()
+const props = defineProps({
+    carouselImgs: Array
+})
+let addr =ref('北京理工大学国防科技园2号类10层')
+
+// 随意一句话
+let oneWord = ref('你他妈的真垃圾')
+async function getRandomWord(){
+    oneWord.value = await HttpReq("https://www.ooopn.com/tool/api/yan/api.php?type=text")
+    setInterval( async ()=>{
+        oneWord.value = await HttpReq("https://www.ooopn.com/tool/api/yan/api.php?type=text")
+    }, 30000)
+}
+getRandomWord()
+
+let placeholder = ref('山姆会员商铺店铺优惠品')
 let shopList = reactive([
-    { "alt": "超市", "name": "超市便利", "pic": "../../../assets/shop1.png"},
-    { "alt": "超市", "name": "超市便利", "pic": "@/assets/shop1.png"},
-    { "alt": "超市", "name": "超市便利", "pic": "@/assets/shop1.png"},
-    { "alt": "超市", "name": "超市便利", "pic": "@/assets/shop1.png"},
-    { "alt": "超市", "name": "超市便利", "pic": "@/assets/shop1.png"},
-    { "alt": "超市", "name": "超市便利", "pic": "@/assets/shop1.png"},
-    { "alt": "超市", "name": "超市便利", "pic": "@/assets/shop1.png"},
-    { "alt": "超市", "name": "超市便利", "pic": "@/assets/shop1.png"},
+    { imgName: "超市", desc: "超市便利", imgUrl: "https://i.postimg.cc/FzmLt3sy/1.png"},
+    { imgName: "菜市场", desc: "菜市场", imgUrl: "https://i.postimg.cc/bYHnxC33/2.png"},
+    { imgName: "水果店", desc: "水果店", imgUrl: "https://i.postimg.cc/QMT9H0Fg/3.png" },
+    { imgName: "鲜花", desc: "鲜花绿植", imgUrl: "https://i.postimg.cc/Vk5bcY1V/4.png" },
+    { imgName: "医药健康", desc: "医药健康", imgUrl: "https://i.postimg.cc/kGct7GBk/5.png" },
+    { imgName: "家居", desc: "家居时尚", imgUrl: "https://i.postimg.cc/nzKX1rYC/6.png" },
+    { imgName: "蛋糕", desc: "烘培蛋糕", imgUrl: "https://i.postimg.cc/HkK8Yfks/7.png" },
+    { imgName: "签到", desc: "签到", imgUrl: "https://i.postimg.cc/dtsy42fv/8.png" },
+    { imgName: "大牌免运", desc: "大牌免运", imgUrl: "https://i.postimg.cc/tCBVf106/9.png" },
+    { imgName: "红包", desc: "红包套餐", imgUrl: "https://i.postimg.cc/0Q16mDST/10.png" },
+
 ])
+    // `http://www.dell-lee.com/imgs/vue3/${item.imgName}.png`
+// https://i.postimg.cc/FzmLt3sy/1.png
+// https://i.postimg.cc/0Q16mDST/10.png
+// https://i.postimg.cc/bYHnxC33/2.png
+// https://i.postimg.cc/QMT9H0Fg/3.png
+// https://i.postimg.cc/Vk5bcY1V/4.png
+// https://i.postimg.cc/kGct7GBk/5.png
+// https://i.postimg.cc/nzKX1rYC/6.png
+// https://i.postimg.cc/HkK8Yfks/7.png
+// https://i.postimg.cc/dtsy42fv/8.png
+// https://i.postimg.cc/tCBVf106/9.png
+
+// 自定义事件,进入搜索框
+const enterSearch = (el) => {
+    // console.log(el.target == document.activeElement);
+    el.target == document.activeElement && router.push('/search')
+}
+
+let noticeShow = ref(true)
+let searchAttch = ref(false)
+
+// 吸顶
+document.addEventListener("scroll",
+    throttleFunc(() => {
+        let { scrollHeight: sh, scrollTop: st, clientHeight: ch } = document.documentElement
+        if (st > 50) {
+            noticeShow.value = false
+            searchAttch.value = true
+        }else {
+            noticeShow.value = true
+            searchAttch.value = false
+        }
+    }, 100)
+)
 
 
 </script>
@@ -46,20 +114,44 @@ let shopList = reactive([
 <style lang="scss" scoped>
 
 
+// 通告栏
+    .notice{
+        box-sizing: border-box;
+        // position: fixed;
+        width: 100vw;
+        height: 0.3rem;
+        line-height: 0.3rem;
+    }
+
+    //  轮播图 指示器样式
+  .custom-indicator {
+      position: absolute;
+      right: 0.05rem;
+      bottom: 0.05rem;
+      padding: 0.02rem 0.05rem;
+      font-size: 0.14rem;
+      background: rgba(255, 255, 255, 0.6);
+      color: #000;
+      font-style: italic;
+  }
+
     .body {
-        height: 3.78rem;
+        // height: 3.88rem;
         background-color: #fff;
+        // overflow-x: hidden;
+    }
+    .block {
+        width: 100%;
+        height: 0.1rem;
+        background-color: #f1f1f1;
     }
 
 
-    .phoneStatus{
-        height: 20px;
-    }
     .address {
         display: flex;
         justify-content: space-around;
         height: 24px;
-        margin-top: 0.16rem;
+        margin-top: 0.1rem;
         span {
             margin-left: -0.24rem;
             line-height: 22px;
@@ -72,17 +164,23 @@ let shopList = reactive([
     }
 
     .search-box {
-        display: block;
-        position: relative;
+        display: flex;
+        align-items: center;
+        margin-top: 0.1rem;
+        height: 0.32rem;
+        width: 100%;
+        background: #fff;
         img {
-            position: absolute;
+            position: relative;
+            width: 0.2rem;
+            height: 0.2rem;
             left: 0.32rem;
-            top: 0.08rem;
         }
         .search {
                 box-sizing: border-box;
                 display: block;
                 margin: 0.16rem auto;
+                margin-left: 0rem;
                 padding: 0  0.44rem ;
                 width: 3.4rem;
                 height: 0.32rem;
@@ -93,6 +191,18 @@ let shopList = reactive([
                 font-size: 0.16rem;
         }
     }
+
+    .search-active {
+        margin-top: 0;
+        height: 0.4rem;
+        line-height: 0.4rem;
+        background: red;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 999
+    }
+
     .swiper{
         margin: 0.12rem auto 0;
         width: 3.39rem;
@@ -111,8 +221,9 @@ let shopList = reactive([
         flex-wrap: wrap;
         .shop-item{
             margin: 0 0.16rem;
-            width: 0.48rem;
+            width: 0.4rem;
             height: 0.71rem;
+            text-align: center;
 
             img {
                 display: block;

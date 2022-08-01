@@ -27,7 +27,7 @@ time, mark, audio, video {
 	/* 主动添加 */
 	list-style:none;
     text-decoration:none;
-	color:black;
+	/* color:black; */
 }
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure, 

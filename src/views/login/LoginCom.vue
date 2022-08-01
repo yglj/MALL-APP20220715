@@ -1,32 +1,39 @@
 <template>
     <div>
-        <div class="phoneStatus"></div>
+        <!-- <div class="phoneStatus"></div> -->
         <div class="login-logo">
             <img src="@/assets/login-logo.png" alt="">
         </div>
         <div class="login-form">
 
-            <input type="text" placeholder="请输入手机号" v-model="uphone.str">
-            <div :class="['tip', { 'fail': !checkStatus, 'success': checkStatus }]">{{ uphone.tip }}</div>
+            <input type="text" placeholder="请输入手机号" v-model="uphone.str" >
+            <div :class="['tip', { 'fail': !tipColor, 'success': tipColor }]">{{ uphone.tip }}</div>
 
             <input type="text" placeholder="请输入密码" v-model="upwd.str">
-            <div class="tip">{{ upwd.tip }}</div>
+            <div :class="['tip', { 'fail': !tipColor, 'success': tipColor }]">{{ upwd.tip }}</div>
 
             <!-- <slot name="input"></slot> -->
             <div v-if=" btnText == '注册' ">
                 <input type="text" placeholder="确认密码" v-model="upwd2.str">
-                <div class="tip" id="pwdAgain">{{ upwd2.tip }}</div>
+                <div :class="['tip', { 'fail': !tipColor, 'success': tipColor }]" id="pwdAgain">{{ upwd2.tip }}</div>
             </div>
 
             <button @click="handleClick">{{ btnText }}</button>
             <slot name="loginText"> </slot>
         </div>
+
+        <SliderCaptcha></SliderCaptcha>
     </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, toRefs } from 'vue'
 import { HttpReq } from '../../tool/request'
+import { useRouter } from 'vue-router';
+import { Dialog } from 'vant';
+import SliderCaptcha from '@/components/SliderCaptcha/SliderCaptcha.vue';
+
+const router = useRouter()
 
 const props = defineProps(
     {
@@ -34,10 +41,10 @@ const props = defineProps(
     }
 )
 
-let uphone = reactive({str: '', name:"手机号", tip: null})
-let upwd = reactive({ str: '', name: "密码", tip: null })
-let upwd2 = reactive({ str: '', name: "确认密码", tip: null })
-let checkStatus = ref(true)
+let uphone = reactive({str: '15012345678', name:"手机号", tip: null})
+let upwd = reactive({ str: '123456', name: "密码", tip: null })
+let upwd2 = reactive({ str: '123456', name: "确认密码", tip: null })
+let tipColor = ref(null)
 
 let {btnText} = toRefs(props)
 
@@ -54,44 +61,63 @@ let {btnText} = toRefs(props)
 function checkIpt(re, obj){
     if(obj.str == ""){
         obj.tip = `${obj.name}为空`
+        tipColor = false
         return false
     }
 
-    if(re.test(obj.str)){
+    if(!re.test(obj.str)){
         obj.tip = `${obj.name}不合规`
+        tipColor = false;
         return false
     }
 
     obj.tip = ""
+    tipColor = true
     return true
 }
 
 function check(){
-    let phoneRe = /^[\u4e00-\u9fa5]{2,4}$/
-    let pwdRe = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/
-    if(checkIpt(phoneRe, uphone) && checkIpt(pwdRe, upwd) ){
-        if (btnText == "注册" && checkIpt(pwdRe, upwd2)){
-            return true
-        }else{
+    let phoneRe = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/
+    // 最少6位，包括至少1个大写字母，1个小写字母，1个数字，1个特殊字符
+    // let pwdRe = /^.*(?=.{6,})(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*? ]).*$/
+    let pwdRe = /^.*(?=.{6,}).*$/
+
+    if( checkIpt(phoneRe, uphone) && checkIpt(pwdRe, upwd) ){
+        if ( btnText.value == "登录" ) return true
+        if ( btnText.value == "注册" && checkIpt(pwdRe, upwd2) ){
+            if ( upwd.str != upwd2.str  ){
+                    upwd2.tip = "两次密码不一致"
+                    tipColor = true
+                    return false
+            }
             return true
         }
     }
-
 }
 
 // 登录或注册
 async function handleClick(){
-    // 校验用户输入
-    if(!check()) return false
-    let res = await HttpReq(
-        'login',
-        {
+    // 校验用户输入, 点击注册或登录
+    if(check()){
+        let data = {
+            "name": 'lj',
             "phone": uphone.str,
             "password": upwd.str
         }
-    )
-    console.log(res);
-    // 发送请求
+        let res = await HttpReq(
+            btnText.value == "注册" ? 'register' : 'login',
+            data,0
+        )
+        if(res.msg == "登录成功"){
+            sessionStorage.setItem("token", res.result.token)
+            sessionStorage.setItem("isLogin", true)
+            router.push('/')
+        }else{
+            // upwd.tip = "用户名或密码不正确"
+            // tipColor = true
+            Dialog({ message: '用户名或密码不正确' });
+        }
+    }
 }
 
 
