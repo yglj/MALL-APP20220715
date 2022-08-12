@@ -27,10 +27,11 @@
 
         </div>
         <div class="shop-list">
-            <div v-for="(item, index) in shopList" :key="index" class="shop-item">
+            <router-link v-for="(item, index) in shopList" :key="index" class="shop-item"
+                :to=" `/classify/${item.classify_id}` ">
                 <img :src="item.imgUrl" :alt="item.imgName">
                 <div>{{item.desc}}</div>
-            </div>
+            </router-link>
         </div>
 
         <div class="block"></div>
@@ -61,16 +62,16 @@ getRandomWord()
 
 let placeholder = ref('山姆会员商铺店铺优惠品')
 let shopList = reactive([
-    { imgName: "超市", desc: "超市便利", imgUrl: "https://i.postimg.cc/FzmLt3sy/1.png"},
-    { imgName: "菜市场", desc: "菜市场", imgUrl: "https://i.postimg.cc/bYHnxC33/2.png"},
-    { imgName: "水果店", desc: "水果店", imgUrl: "https://i.postimg.cc/QMT9H0Fg/3.png" },
-    { imgName: "鲜花", desc: "鲜花绿植", imgUrl: "https://i.postimg.cc/Vk5bcY1V/4.png" },
-    { imgName: "医药健康", desc: "医药健康", imgUrl: "https://i.postimg.cc/kGct7GBk/5.png" },
-    { imgName: "家居", desc: "家居时尚", imgUrl: "https://i.postimg.cc/nzKX1rYC/6.png" },
-    { imgName: "蛋糕", desc: "烘培蛋糕", imgUrl: "https://i.postimg.cc/HkK8Yfks/7.png" },
-    { imgName: "签到", desc: "签到", imgUrl: "https://i.postimg.cc/dtsy42fv/8.png" },
-    { imgName: "大牌免运", desc: "大牌免运", imgUrl: "https://i.postimg.cc/tCBVf106/9.png" },
-    { imgName: "红包", desc: "红包套餐", imgUrl: "https://i.postimg.cc/0Q16mDST/10.png" },
+    { imgName: "超市", desc: "超市便利", imgUrl: "https://i.postimg.cc/FzmLt3sy/1.png", classify_id: 1921},
+    { imgName: "菜市场", desc: "菜市场", imgUrl: "https://i.postimg.cc/bYHnxC33/2.png", classify_id: 1873 },
+    { imgName: "水果店", desc: "水果店", imgUrl: "https://i.postimg.cc/QMT9H0Fg/3.png", classify_id: 1873 },
+    { imgName: "鲜花", desc: "鲜花绿植", imgUrl: "https://i.postimg.cc/Vk5bcY1V/4.png", classify_id: 1920 },
+    { imgName: "医药健康", desc: "医药健康", imgUrl: "https://i.postimg.cc/kGct7GBk/5.png", classify_id: 1923 },
+    { imgName: "家居", desc: "家居时尚", imgUrl: "https://i.postimg.cc/nzKX1rYC/6.png", classify_id: 1922 },
+    { imgName: "蛋糕", desc: "烘培蛋糕", imgUrl: "https://i.postimg.cc/HkK8Yfks/7.png", classify_id: 1873 },
+    { imgName: "签到", desc: "签到", imgUrl: "https://i.postimg.cc/dtsy42fv/8.png", classify_id: 1858 },
+    { imgName: "大牌免运", desc: "大牌免运", imgUrl: "https://i.postimg.cc/tCBVf106/9.png", classify_id: 1876 },
+    { imgName: "红包", desc: "红包套餐", imgUrl: "https://i.postimg.cc/0Q16mDST/10.png", classify_id: 1875 },
 
 ])
     // `http://www.dell-lee.com/imgs/vue3/${item.imgName}.png`

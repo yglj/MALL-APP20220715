@@ -1,5 +1,6 @@
 
-var Mock = require('mockjs')
+// var Mock = require('mockjs')
+import { Mock } from 'mockjs'
 var data = Mock.mock({
     // 属性 list 的值是一个数组，其中含有 1 到 10 个元素
     'list|1-10': [{
@@ -10,6 +11,9 @@ var data = Mock.mock({
 })
 // 输出结果
 console.log(JSON.stringify(data, null, 4))
+console.log(Random.cname(),
+Mock.mock('@cname'),
+Mock.mock('@cname()'));
 /*
 数据模板定义规范（Data Template Definition，DTD）
 数据占位符定义规范（Data Placeholder Definition，DPD）

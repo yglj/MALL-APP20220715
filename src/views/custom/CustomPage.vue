@@ -25,10 +25,10 @@
         <div class="myManger">
             <div class="manger-item" v-for="(item, idx) in mangerList" :key="idx">
                 <div class="manger-th">
-                    <img src="" alt="">
+                    <van-icon :name="item.icon" size="18" :color="item.color" />
                     {{ item.tab }}
                 </div>
-                <div class="enter">&gt;</div>
+                <div class="enter" @click="$router.push('/addr')" >&gt;</div>
             </div>
         </div>
         <Docker></Docker>
@@ -44,9 +44,9 @@ let ownList = [
     { tab: "黑条", text: '22218'},
 ]
 let mangerList = [
-    { tab: "我的钱包"},
-    { tab: "我的地址"},
-    { tab: "客服与帮助"},
+    { tab: "我的钱包", icon:"card"},
+    { tab: "我的地址", icon: "wap-home", color: "red" },
+    { tab: "客服与帮助", icon: "vip-card" },
 ]
 </script>
 

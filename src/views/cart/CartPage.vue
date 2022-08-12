@@ -41,10 +41,11 @@
                         共12件/3.9kg <i>V</i>
                     </div> -->
                 </div>
+                <div v-if="cartList.length == 0"> 空空如也。。。。。。</div>
             </van-list>
         </div>
 
-        <van-submit-bar :price="totalPrice" button-text="提交订单" @submit="onSubmit" class="submit-bar">
+        <van-submit-bar :price="totalPrice" button-text="即刻下单" @submit="toPay" class="submit-bar">
             <van-checkbox v-model="checkedAll">全选</van-checkbox>
             <template #tip v-if="checkedAll">
                 <!-- 你的收货地址不支持配送, <span @click="onClickLink">修改地址</span> -->
@@ -62,9 +63,10 @@ import GoodList from '../home/shop/GoodList.vue';
 import { ref, computed, onBeforeMount, onMounted , watchEffect } from 'vue'
 import { useStore, mapState } from 'vuex'
 import { Toast } from 'vant'
+import { useRouter } from 'vue-router'
 
 const store = useStore()
-
+const router = useRouter()
 // all checked
 let checkedCart = ref({})
 let checkedAll = computed({
@@ -78,7 +80,6 @@ let checkedAll = computed({
         }
     }
 })
-
 
 // cart page data list
 let cartList = computed( ()=>{
@@ -105,6 +106,27 @@ let totalPrice = computed(() => cartList.value && cartList.value.reduce( (pre, c
     return  checkedCart.value[cur.uuid] ? pre + cur.sale_price * cur.num : pre
 }, 0 ) * 100 )
 
+// ordered
+const toPay = () => {
+    let orderedList = []
+    if(! Object.values(checkedCart.value).length) {
+        Toast('please checked goods');
+        return
+    }
+    Object.keys(checkedCart.value).forEach(val => {
+        let item = cartList.value.find( v => v.uuid == val)
+        orderedList.push({
+            id: item.goods_id,
+            num: item.num,
+            cart_id: item.cid
+        })
+    })
+    store.commit({
+        type: "order/PREPARE_ORDER",
+        goods_info: orderedList
+    })
+    router.push('/pay')
+}
 
 
 const changeCartNum = async (goods_id, add) => {
@@ -139,7 +161,6 @@ onBeforeMount(() => {
 })
 
 
-const onSubmit = () => Toast('点击按钮');
 const onClickLink = () => Toast('修改地址');
 
 const onLoad = ()=>{
@@ -152,7 +173,9 @@ const onLoad = ()=>{
 
 <style lang="scss" scoped>
 
-
+.cart-body {
+    height: calc(100vh - 0.2rem);
+}
 
 .submit-bar {
     bottom: 0.5rem;

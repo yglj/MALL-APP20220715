@@ -43,3 +43,16 @@ export const scrollDoSome = (cb, limit_time=300) => {
         }, limit_time)
     )
 }
+
+//  防抖
+export const debounce = (cb, time) => {
+    let timer = null
+    return (v2v, ...args) => {
+        clearTimeout(timer)
+        timer = setTimeout(
+            () => {
+                cb(v2v, args)
+            }, time
+        )
+    }
+}

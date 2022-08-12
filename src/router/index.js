@@ -74,7 +74,6 @@ const routes = [
     path: '/cart',
     name: 'cart',
     component: () => import(/* webpackChunkName: "cart" */ '../views/cart/CartPage.vue'),
-
   },
   {
     path: '/me',
@@ -85,6 +84,11 @@ const routes = [
     path: '/addr',
     name: 'addr',
     component: () => import(/* webpackChunkName: "addr" */ '../views/custom/AddrPage.vue')
+  },
+  {
+    path: '/classify/:classify_id',
+    name: 'classify',
+    component: () => import(/* webpackChunkName: "addr" */ '../views/home/components/Classify.vue')
   },
   // {
   //   path: '/about',

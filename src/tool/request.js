@@ -14,9 +14,9 @@ export const HttpReq = (url, data, method) => {
     let headers =  {
         "Content-Type": "application/json"
     }
-
+    let project_id = data && data["project_id"] ? data["project_id"] : 249
     if (url.includes('bluej') || url.startsWith('/')){
-        data = { ...data, "project_id": 249 }
+        data = { ...data, project_id }
         headers["x-token"] = sessionStorage.getItem("token")
     }
 

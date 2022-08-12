@@ -76,19 +76,26 @@
                             <van-icon name="cross" class="pop-close" @click="showPopover = false" />
                         </div>
                         <div class="pop-msg">
-                            <van-button icon="plus" type="primary" size="small" @click="changeCartItem( 1)" />
-                            <span class="pop-num"> {{ cartCountById(cardRef.id) }} </span>
-                            <van-button icon="minus" type="warning" size="small" @click="changeCartItem( -1)"
+                            <!-- <van-button icon="plus" type="primary" size="small" @click="changeCartItem( 1)" /> -->
+                            <van-button icon="plus" type="primary" size="small"
+                                @click="immediatelyBuy( prepareOrder[0].num + 1)" />
+                            <!-- <span class="pop-num"> {{ cartCountById(cardRef.id) }} </span> -->
+                            <span class="pop-num"> {{ prepareOrder[0].num }} </span>
+                            <!-- <van-button icon="minus" type="warning" size="small" @click="changeCartItem( -1)" -->
+                            <van-button icon="minus" type="warning" size="small"
+                                @click="immediatelyBuy( prepareOrder[0].num - 1)"
                                 color="linear-gradient(to right, #ff6034, #ee0a24)" />
-                            <span class="pop-price"> ￥{{ cardRef.price * cartCountById(cardRef.id) }} </span>
-                            <van-button type="primary" size="large" class="go-cart" color="#7232dd" to="/pay">前往下单
+                            <!-- <span class="pop-price"> ￥{{ cardRef.price * cartCountById(cardRef.id) }} </span> -->
+                            <span class="pop-price"> ￥{{ cardRef.price * prepareOrder[0].num }} </span>
+                            <van-button type="primary" size="large" class="go-cart" color="#7232dd" @click="toPay">去结算
                             </van-button>
                         </div>
                     </van-col>
                     <!-- </van-row> -->
                 </van-grid>
                 <template #reference>
-                    <van-action-bar-button type="danger" text="立即购买" color="#7232dd" style="width:140px" />
+                    <van-action-bar-button type="danger" text="立即购买" color="#7232dd" style="width:140px"
+                        @click="immediatelyBuy(1)" />
                 </template>
             </van-popover>
         </van-action-bar>
@@ -103,6 +110,7 @@ import { HttpReq } from '@/tool/request';
 import { ConfigProvider } from 'vant'
 import { scrollDoSome } from '@/tool/ty'
 import { useStore } from 'vuex'
+import { isNumeric } from 'vant/lib/utils';
 
 //  vuex
 let store = useStore()
@@ -132,7 +140,7 @@ let cardRef = reactive({
 let navBarStyle = ref("goods-navbar")
 let activeName = ref("a")
 let showPopover = ref(false)
-
+let prepareOrder = computed(() => store.state.order.prepareOrder )
 //method
 const goBack = () => {
     // history.back()
@@ -140,15 +148,21 @@ const goBack = () => {
 }
 
 const changeCartItem = async (add) => {
-    let res
-    let num = cartCountById.value(cardRef.id)
-    if (num <=1 && add < 0) return
-    if (num > 0) {
-        res = await store.dispatch("cart/changeCartItem", { "goods_id": cardRef.id, "add": add })
-    } else {
-        res = await store.dispatch("cart/addCart", cardRef.id)
-    }
-    store.dispatch("cart/getCartData", cardRef.id)
+    // update cart num to request
+    // let res
+    // let num = cartCountById.value(cardRef.id)
+    // if (num <=1 && add < 0) return
+    // if (num > 0) {
+    //     res = await store.dispatch("cart/changeCartItem", { "goods_id": cardRef.id, "add": add })
+    // } else {
+    //     res = await store.dispatch("cart/addCart", cardRef.id)
+    // }
+    // store.dispatch("cart/getCartData", cardRef.id)
+
+    // update immediately  buy num
+    // store.commit({
+    //     type: "order/DEL_PREPARE_ORDER",
+    // })
 }
 
 const addCart = async () => {
@@ -174,6 +188,24 @@ const getGoodsData = async () => {
     cardRef.s_goods_photos = res.s_goods_photos
     cardRef.img_one = res.s_goods_photos[0].path
 }
+
+//  first params is not event e,  need params $event
+const immediatelyBuy = (num) => {
+    // if( !isNumeric(num) ) return
+    store.commit({
+        type: "order/PREPARE_ORDER",
+        goods_info: [{
+            id: cardRef.id,
+            num: num || 1
+        }]
+    })
+}
+
+const toPay = () => {
+    router.push('/pay')
+}
+
+//  called func
 getGoodsData()
 
 scrollDoSome( (sh, st, ch)=>{
@@ -181,13 +213,6 @@ scrollDoSome( (sh, st, ch)=>{
 }, 100)
 
 const cardThemeVars = {
-    // rateIconFullColor: '#07c160',
-    // sliderBarHeight: '4px',
-    // sliderButtonWidth: '20px',
-    // sliderButtonHeight: '20px',
-    // sliderActiveBackgroundColor: '#07c160',
-    // buttonPrimaryBorderColor: '#07c160',
-    // buttonPrimaryBackgroundColor: '#07c160',
     cardPriceColor: "#f2270c",
     cardDescColor: "#aaa",
     cardFontSize: "0.16rem",
@@ -199,7 +224,9 @@ const cardThemeVars = {
 
 <style lang="scss" scoped>
 
-
+.goods-ct {
+    height: calc(100vh - 0.2rem);
+}
 
 
 .popContent{
@@ -223,13 +250,13 @@ const cardThemeVars = {
         h3 {
             display: inline-block;
             margin: 0.1rem 0;
-            font-size: 0.2rem;
+            font-size: 0.16rem;
             // line-height: 0.3rem;
         }
         .pop-close{
-            position: relative;
-            left: 0.2rem;
-            top: -0.1rem;
+            position: absolute;
+            right: 0.05rem;
+            top: 0.05rem;
             color: red;
         }
         .pop-num {

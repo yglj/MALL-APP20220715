@@ -1,6 +1,8 @@
 import { createStore } from 'vuex'
 import user from './user'
 import cart from './cart'
+import order from './order'
+import addr from './addr'
 
 export default createStore({
   state: {
@@ -15,6 +17,7 @@ export default createStore({
   },
   mutations: {
       changeRouterType(state, newRouterType){
+        console.log(newRouterType);
         state.routerType = newRouterType
       }
   },
@@ -22,6 +25,8 @@ export default createStore({
   },
   modules: {
     user,
-    cart
+    cart,
+    order,
+    addr
   }
 })

@@ -1,27 +1,27 @@
 <template>
-    <div>
-        <!-- 邪门;因为路由守卫中未调用next,导致页面空白且不报错，为此花费了3个小时的无用功 -->
-        <!-- router-view的v-slot
-        router-view也提供给我们一个插槽，可以用于 <transition> 和 <keep-alive>
-        组件来包裹你的路由组件：Component：要渲染的组件；
-        route：解析出的标准化路由对象； -->
-        <router-view></router-view>
-            <!-- <transition :name="route.meta.transition || 'fade'" mode="out-in"> -->
-        <!-- <router-view v-slot="{ Component, route }">
-            <transition mode="out-in" :name="transitionName" @before-enter="beforeEnter" @after-leave="afterLeave">
+    <div >
+        <router-view v-slot="{ Component, route }">
+            <transition :name="transitionName" @before-enter="beforeEnter" @after-leave="afterLeave">
                 <keep-alive inclue="virtualTaskStack">
                     <component :is="Component" :key="route.meta.usePathKey ? route.path : undefined"
-                        :class="{ ding: isAnimate}" />
+                        :class="{ ding: isAnimate}"  />
                 </keep-alive>
             </transition>
-        </router-view> -->
+        </router-view>
 
     </div>
 </template>
 
 
 
+
 <script>
+
+// <!-- 邪门;因为路由守卫中未调用next,导致页面空白且不报错，为此花费了3个小时的无用功 -->
+// <!-- router-view的v-slot
+// router-view也提供给我们一个插槽，可以用于 <transition> 和 <keep-alive>
+// 组件来包裹你的路由组件：Component：要渲染的组件；
+// route：解析出的标准化路由对象； -->
 
 //  常量，暴露出全局
     const ROUTER_TYPE_PUSH = 'push'
@@ -32,7 +32,10 @@
 
 </script>
 
+
 <script setup>
+// 页面切换动画失败，做不出来
+
 /*
 虚拟任务栈
 标记新旧页面：新页面播放push动画，离开页面播放back动画
@@ -42,10 +45,10 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 let router = useRouter()
-let transitionName = ref('')
+let transitionName = ref()
 
 //  初始化虚拟任务栈
-let virtualTaskStack = ref([])
+let virtualTaskStack = ref([props.mainComponentName])
 const clearTask = () => { virtualTaskStack.value = [props.mainComponentName] }
 
 
@@ -68,8 +71,8 @@ router.beforeEach((to) => {
 
 // isAimate控制动画执行
 let isAnimate = ref(false)
-const beforeEnter = () => { isAnimate = true }
-const afterLeave = () => { isAnimate = false }
+const beforeEnter = () => { isAnimate.value = true }
+const afterLeave = () => { isAnimate.value = false }
 
 
 
@@ -95,6 +98,8 @@ let props = defineProps(
         }
     }
 )
+
+const name = 'home'
 </script>
 
 
@@ -102,7 +107,7 @@ let props = defineProps(
 <style lang="scss" scoped>
 
 .ding {
-    position: fixed;
+    position: relative;
     left: 0;
     top: 0;
     width: 100%;
@@ -111,12 +116,12 @@ let props = defineProps(
 // push页面时：新页面的进入动画
 .push-enter-active {
   animation-name: push-in;
-  animation-duration: 0.4s;
+  animation-duration: .4s;
 }
 // push页面时：老页面的退出动画
 .push-leave-active {
   animation-name: push-out;
-  animation-duration: 0.4s;
+  animation-duration: .4s;
 }
 // push页面时：新页面的进入动画
 @keyframes push-in {
@@ -142,13 +147,13 @@ let props = defineProps(
   // 后退页面时：即将展示的页面动画
   .back-enter-active {
       animation-name: back-in;
-      animation-duration: 0.4s;
+      animation-duration: .4s;
   }
 
   // 后退页面时：后退的页面执行的动画
   .back-leave-active {
       animation-name: back-out;
-      animation-duration: 0.4s;
+      animation-duration: .4s;
   }
 
   // 后退页面时：即将展示的页面动画

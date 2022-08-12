@@ -90,6 +90,10 @@ const loadRecommend = () => {
         --van-toast-loading-icon-color: var(--van-white)
     }
 
+    .wrapper {
+        height: calc(100vh - 0.2rem);
+    }
+
     .cimg {
         width: 100%;
         height: 2rem;

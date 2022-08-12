@@ -3,10 +3,10 @@
         <div class="list-zone">
             <div class="list-title">
                 <h2>搜索历史</h2>
-                <button @click="clearHistory">清除搜索历史</button>
+                <button @click="clearHistory" v-show="historyList.length">清除搜索历史</button>
             </div>
             <div class="data-list">
-                <div v-for="(item, index) in historyList" :key="index">
+                <div v-for="(item, index) in historyList" :key="index" @click="searchHot(item)">
                     {{item}}
                 </div>
             </div>
@@ -14,7 +14,7 @@
         <div class="list-zone">
             <h2>热门搜索</h2>
             <div class="data-list">
-                <div v-for="(item, index) in hotList" :key="index">
+                <div v-for="(item, index) in hotList" :key="index" @click="searchHot(item)">
                     {{item}}
                 </div>
             </div>
@@ -25,15 +25,24 @@
 <script setup>
 
 const props = defineProps({
-    historyList: Array,
+    historyList: [Array, Function],
     hotList: Array
 })
+
+const emits = defineEmits(['searchHot', 'clearHistory'])
+
+const searchHot = (val) => {
+    emits('searchHot', val)
+}
 
 const { historyList, hotList } = props
 
 const clearHistory = () => {
-    console.log("clear");
-    historyList.value
+    emits('clearHistory')
+    let len = historyList.length
+    for (let i = 0; i < len ; i++){
+        historyList.pop()
+    }
 }
 
 </script>

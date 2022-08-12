@@ -6,7 +6,7 @@
         </div>
         <div class="login-form">
 
-            <input type="text" placeholder="请输入手机号" v-model="uphone.str" >
+            <input type="text" placeholder="请输入手机号" v-model="uphone.str">
             <div :class="['tip', { 'fail': !tipColor, 'success': tipColor }]">{{ uphone.tip }}</div>
 
             <input type="text" placeholder="请输入密码" v-model="upwd.str">
@@ -22,7 +22,9 @@
             <slot name="loginText"> </slot>
         </div>
 
-        <SliderCaptcha></SliderCaptcha>
+        <SliderCaptcha v-if="showCaptcha" @captchaSuccess="captchaSuccess" @captchaFail="captchaFail"
+            v-model:showCaptcha="showCaptcha">
+        </SliderCaptcha>
     </div>
 </template>
 
@@ -32,6 +34,7 @@ import { HttpReq } from '../../tool/request'
 import { useRouter } from 'vue-router';
 import { Dialog } from 'vant';
 import SliderCaptcha from '@/components/SliderCaptcha/SliderCaptcha.vue';
+import { Toast } from 'vant'
 
 const router = useRouter()
 
@@ -48,7 +51,7 @@ let tipColor = ref(null)
 
 let {btnText} = toRefs(props)
 
-
+let showCaptcha = ref(false)
 
 /*
 1、姓名
@@ -75,6 +78,22 @@ function checkIpt(re, obj){
     tipColor = true
     return true
 }
+
+
+
+const captchaSuccess = () => {
+    Toast({ message: '验证成功！' , duration: 500})
+    let timer = setTimeout(() => {
+        router.push('/')
+        showCaptcha.value = false
+        clearTimeout(timer)
+    }, 1000)
+}
+
+const captchaFail = () => {
+    Toast('验证失败！， 请重试')
+}
+
 
 function check(){
     let phoneRe = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/
@@ -111,7 +130,8 @@ async function handleClick(){
         if(res.msg == "登录成功"){
             sessionStorage.setItem("token", res.result.token)
             sessionStorage.setItem("isLogin", true)
-            router.push('/')
+            showCaptcha.value = true
+            // router.push('/')
         }else{
             // upwd.tip = "用户名或密码不正确"
             // tipColor = true

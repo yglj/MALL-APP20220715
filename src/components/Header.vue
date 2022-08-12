@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { defineProps, defineEmits, toRefs } from 'vue'
+import { defineProps, defineEmits, toRefs, emits } from 'vue'
 import { useRouter } from 'vue-router'
 
 export default {
@@ -23,28 +23,37 @@ export default {
             type: String,
             required: true,
             default: "xxoo"
+        },
+        addrMangerState: {
+            type: String
         }
     },
-    setup(props) {
+    emits: [
+        'chgAddrStatus', 'doClick', 'goBack'
+    ],
+    setup(props, context) {
 
-        // const emits = defineEmits([
-        //     'doSomethingBtn'
-        // ])
-
-        let { title, doName } = toRefs(props)
+        let { title, doName, addrMangerState } = toRefs(props)
 
         const doClick = () => {
-            //
+            context.emit('doClick')
         }
 
         let router = useRouter()
         const goBack = () => {
-            router.go(-1)
+            context.emit('goBack')
+            if( addrMangerState.value == 'list'){
+                router.go(-1)
+            }else {
+                // only setup script use defineEmits
+                context.emit('chgAddrStatus')
+            }
         }
 
-        return { title, doName, goBack }
+        return { title, doName, goBack, doClick }
     }
 }
+
 </script>
 
 <style lang="scss" scoped>
