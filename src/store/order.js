@@ -18,7 +18,7 @@ export default {
     },
     mutations: {
         [GET_ORDER_LIST](state, data){
-            console.log("[mutatuions]: 数据已更新", data.result.rows);
+            // console.log("[mutatuions]: 数据已更新", data.result.rows);
             state.orderList = data.result.rows
         },
         [PREPARE_ORDER](state, {goods_info}){

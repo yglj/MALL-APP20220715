@@ -18,7 +18,7 @@ export default {
     mutations: {
         getCartData(state, res){
             state.cartList = res.result
-            console.log(res.result);
+            // console.log(res.result);
         }
     },
     actions: {

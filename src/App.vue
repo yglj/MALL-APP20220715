@@ -19,14 +19,17 @@ time()
 
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" >
+    @import url('./style/reset.css');
+    @import url('./style/base.scss');
     .slider-body {
-          height: calc(100vh - 0.2rem);
+        position: relative;
+        width: 100%;
+        height: calc(100vh - 0.2rem);
+        overflow: hidden;
     }
 
     .phoneStatus {
-      // position: fixed;
-      // z-index: 999;
       width: 100%;
       height: 0.2rem;
       background: url("@/assets/phone-State.png");
@@ -41,4 +44,5 @@ time()
         background: #fff;
       }
     }
+
 </style>

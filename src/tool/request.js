@@ -2,6 +2,7 @@
 
 import axios from 'axios'
 
+
 const http = axios.create({
     baseURL: 'http://shop.bluej.cn/api',
     timeout: 6000

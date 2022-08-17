@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Header title="商品分类" doName="" @goBack="$router.back()"></Header>
+        <Header title="商品分类" doName="" @goBack="goBack"></Header>
         <van-row class="classify-list">
             <div v-for="item in classifyList" :key="item.id"
                 :class="['classify-item', { 'classify-active': classifyId == item.id }]" @click="classifyId = item.id">
@@ -12,15 +12,15 @@
 
             <div class="waterfull" v-masonry gutter="15" percent-position="true" fit-width="true" ref="waterfullEl">
                 <div v-masonry-tile class="card" v-for="item in waterfullList(classifyId)" :key="item.id">
-                    <router-link :to="'/goods/' + item.id " class="shop-info">
-                    <van-badge content="Hot" position="top-left" v-if="item.sold_num > 2" class="badge">
-                    </van-badge>
+                    <router-link :to="'/goods/' + item.id" class="shop-info">
+                        <van-badge content="Hot" position="top-left" v-if="item.sold_num > 2" class="badge">
+                        </van-badge>
                         <img :src="item.s_goods_photos[0].path" alt="" />
                         <div class="goodsMsg">
                             <div class="goodsName"> {{ item.name }} </div>
                             <van-row justify="space-between">
-                                <strong>￥{{ item.sale_price }} <u>￥{{item.price}}</u></strong>
-                                <span>月售:{{item.sold_num}}</span>
+                                <strong>￥{{ item.sale_price }} <u>￥{{ item.price }}</u></strong>
+                                <span>月售:{{ item.sold_num }}</span>
                             </van-row>
                         </div>
                     </router-link>
@@ -38,17 +38,18 @@ import Header from '@/components/Header.vue';
 import { computed, ref, onMounted, onUpdated, nextTick } from 'vue'
 import { useStore } from 'vuex';
 import { HttpReq } from '@/tool/request';
-import { useRouter} from 'vue-router'
+import { useRouter } from 'vue-router'
 
+let store = useStore()
 let router = useRouter()
 
 let classifyId = ref(router.currentRoute.value.params.classify_id)
 let classifyList = ref(null)
 
 let waterfullList = computed(() => id => {
-    let item = classifyList.value && classifyList.value.find(v=>v.id == id)
+    let item = classifyList.value && classifyList.value.find(v => v.id == id)
     return item && item.s_goods
-} )
+})
 
 
 const getGoodsClassify = async () => {
@@ -61,7 +62,10 @@ const getGoodsClassify = async () => {
     // })
 }
 
-
+const goBack = () => {
+    router.back()
+    store.commit('changeRouterType', 'back')
+}
 
 const classifyNameCN = {
     recommend: "推荐",
@@ -88,42 +92,37 @@ getGoodsClassify()
 </script>
 
 <style lang="scss" scoped>
-
-
-
-
-
-
-
-
 .classify-list {
     width: 100%;
     height: 0.34rem;
     line-height: 0.34rem;
-    border-top: 1px solid #ccc;
+    border-top: 1px solid #555;
     display: inline-block;
     white-space: nowrap;
     // background: rgb(127, 191, 244);
     overflow-y: hidden;
     overflow-x: scroll;
+
     &::-webkit-scrollbar {
-            display: none;
-            /* Chrome Safari */
-        }
+        display: none;
+        /* Chrome Safari */
+    }
+
     .classify-item {
         display: inline-block;
         width: 0.6rem;
         margin: 0 0.1rem;
         font-size: 0.16rem;
         line-height: 0.24rem;
-        color: rgb(38, 172, 229);
+        color: #333;
         text-align: center;
     }
+
     .classify-active {
         margin: 0.04rem 0;
         height: 0.24rem;
-        background: rgb(230, 243, 81);
-        color: red;
+        background: #0389ff;
+        color: #fff;
         border-radius: 0.2rem;
     }
 }
@@ -136,12 +135,13 @@ getGoodsClassify()
 
 .waterfull {
     box-sizing: border-box;
-    min-height: calc( 100vh - 1rem);
+    min-height: calc(100vh - 1rem);
     padding: 0.2rem 0.1rem;
 
 
     .title {
         margin: 0.14rem 0 0.14rem 0.18rem;
+
         h2 {
             font-size: 0.18rem;
             color: #333;
@@ -158,7 +158,9 @@ getGoodsClassify()
         position: relative;
 
         .badge {
-            width:0.4rem; height:0.2rem; line-height:0.2rem;
+            width: 0.4rem;
+            height: 0.2rem;
+            line-height: 0.2rem;
             position: absolute;
             top: 0.1rem;
             left: 0.1rem;
@@ -191,6 +193,7 @@ getGoodsClassify()
                 color: #ff4142;
                 font-size: 0.14rem;
             }
+
             u {
                 text-decoration: line-through;
                 color: #999;

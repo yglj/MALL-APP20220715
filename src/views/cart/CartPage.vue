@@ -9,26 +9,42 @@
             <van-list v-model:loading="loading" :finished="finished" @load="onLoad">
                 <div class="cart-item" v-for="(item, idx) in cartList" :key="idx">
                     <div class="cart-item-u">
-                        <h3>{{ `${item.pid}-${item.cid}-${item.goods_id}  ` }}</h3>
+                        <!-- <h3>{{ `${item.pid}-${item.cid}-${item.goods_id}  ` }}</h3> -->
+                        <!-- <h3>{{ `${item.title}  ` }}</h3> -->
                     </div>
                     <div class="cart-item-bd">
                         <van-swipe-cell class="cart-item-swipe">
-                            <van-checkbox v-model="checkedCart[item.uuid]" checked-color="#ee0a24" size="21"
-                                class="cart-item-bd-l">
+                            <van-checkbox v-model="checkedCart[item.uuid]"  size="21"
+                                class="cart-item-bd-l"
+                                checked-color=""
+                                >
                             </van-checkbox>
-                            <van-card :num="item.num" tag="hot" :price="item.sale_price" :desc="item.desc"
+                            <van-card  tag="hot" :price="item.sale_price + '.0' " :desc="item.desc" centered
                                 :title="item.name" class="cart-item-bd-r" :thumb="item.imgOne"
-                                :origin-price="item.price">
+                                :origin-price="item.price"
+                                :thumb-link=" `/#/goods/${item.goods_id}` "
+                                >
                                 <template #tags>
                                     <router-link class="to-goods" :to=" `/goods/${item.goods_id}`">
                                     </router-link>
                                 </template>
                                 <template #footer>
-                                    <van-button square size="normal" @click="changeCartNum( item.goods_id , 1)">+
+                                    <div class="num-btns">
+                                    <van-button square size="normal" type="primary" plain
+                                    @click="changeCartNum( item.goods_id , 1)"
+                                     class="num-btn"
+                                    >+
                                     </van-button>
-                                    <van-button square size="normal" type="danger"
-                                        @click="changeCartNum( item.goods_id , -1)">-
+                                    <div class="num">
+                                        <van-icon name="cross" />
+                                        {{ item.num }}
+                                    </div>
+                                    <van-button square size="normal" type="danger" plain
+                                        @click="changeCartNum( item.goods_id , -1)"
+                                        class="num-btn"
+                                        >-
                                     </van-button>
+                                    </div>
                                 </template>
                             </van-card>
                             <template #right>
@@ -37,19 +53,18 @@
                             </template>
                         </van-swipe-cell>
                     </div>
-                    <!-- <div class="allshow-btn" v-if="item.goodsNum > 2">
-                        共12件/3.9kg <i>V</i>
-                    </div> -->
+
                 </div>
-                <div v-if="cartList.length == 0"> 空空如也。。。。。。</div>
+                <div v-if="cartList.length == 0" class="blank-cart"> 空空如也...  </div>
             </van-list>
         </div>
 
-        <van-submit-bar :price="totalPrice" button-text="即刻下单" @submit="toPay" class="submit-bar">
+        <van-submit-bar :price="totalPrice" button-text="即刻下单" @submit="toPay" class="submit-bar"
+        button-color="#0389ff"
+        >
             <van-checkbox v-model="checkedAll">全选</van-checkbox>
-            <template #tip v-if="checkedAll">
-                <!-- 你的收货地址不支持配送, <span @click="onClickLink">修改地址</span> -->
-                <van-button square size="size" @click="delCartAll">全部删除
+            <template #tip v-if="checkedAll" class="checked-tip">
+                <van-button square  plain hairline type="primary" @click="delCartAll" size="mini">全部删除
                 </van-button>
             </template>
         </van-submit-bar>
@@ -64,6 +79,7 @@ import { ref, computed, onBeforeMount, onMounted , watchEffect } from 'vue'
 import { useStore, mapState } from 'vuex'
 import { Toast } from 'vant'
 import { useRouter } from 'vue-router'
+import { Dialog , Notify } from 'vant'
 
 const store = useStore()
 const router = useRouter()
@@ -134,22 +150,36 @@ const changeCartNum = async (goods_id, add) => {
     store.dispatch('cart/getCartData')
 }
 const delCartItem = async (cart_id) => {
-    let res = await store.dispatch('cart/delCartItem', {cart_id})
-    store.dispatch('cart/getCartData')
-    // console.log(res);
+    Dialog.confirm({
+        message: '确认删除？',
+    }).then( async  () => {
+        // on close
+        let res = await store.dispatch('cart/delCartItem', {cart_id})
+        store.dispatch('cart/getCartData')
+        Notify({ message: res.msg , background:"#1c79c0"});
+    }).catch(() => {});
+
 }
 
 const delCartAll = () => {
-    let allRes = cartList.value.map(async (v) => {
-        let res = await store.dispatch('cart/delCartItem', { cart_id: v.cid })
-        console.log(res);
-    })
-    Promise.all(allRes).then((res)=>{
-            Toast.success('已成功全部删除')
-            store.dispatch('cart/getCartData')
-            checkedCart.value = []
-        }
-    )
+    Dialog.confirm({
+        message: '确认删除？',
+    }).then( async  () => {
+        // on close
+        let allRes = cartList.value.map(async (v) => {
+            let res = await store.dispatch('cart/delCartItem', { cart_id: v.cid })
+            console.log(res);
+        })
+        Promise.all(allRes).then((res)=>{
+                Toast.success('已成功全部删除')
+                store.dispatch('cart/getCartData')
+                checkedCart.value = []
+            }
+        )
+        Notify({ message: res.msg , background:"#1c79c0"});
+    }).catch(() => {});
+
+
 }
 
 let loading = ref(null)
@@ -173,12 +203,22 @@ const onLoad = ()=>{
 
 <style lang="scss" scoped>
 
+
+.blank-cart {
+    text-align: center;
+    font-size: 0.2rem;
+
+}
+
 .cart-body {
     height: calc(100vh - 0.2rem);
+    overflow: hidden;
 }
 
 .submit-bar {
     bottom: 0.5rem;
+
+
     &::after {
         content: '';
         display: block;
@@ -201,8 +241,9 @@ const onLoad = ()=>{
 
 .cart-ct {
     background: #f3f3f3;
-    min-height: 70vh;
-    padding: 0.2rem 0 0.8rem;
+    height: 70vh;
+    overflow: scroll;
+    padding: 0.2rem 0 1rem;
 
     .cart-item {
         box-sizing: border-box;
@@ -223,23 +264,52 @@ const onLoad = ()=>{
 
         .cart-item-bd {
             width: 100%;
-            margin-top: 0.1rem;
+            // margin-top: 0.1rem;
+            position: relative;
             .cart-item-bd-l {
                 display: inline-block;
-                position: relative;
+                position: absolute;
+                left: 0;
                 top: 50%;
                 transform: translateY(-50%);
-                width: 10%;
+                z-index:1;
             }
             .cart-item-bd-r {
-                display: inline-block;
-                width: 90%;
-                border-radius: 0.1rem;
+                padding: 0;
+                padding-left: 0.36rem;
+                margin-bottom: 0.2rem;
+                width: 100%;
+                align-items: center;
+
                 background: #fff;
+            }
+
+            .num-btns {
+                display: flex;
+                justify-content: flex-end;
+                position: absolute;
+                bottom: -0.2rem;
+                right: 0.1rem;
+                .num-btn {
+                    height: 0.2rem;
+                    max-width: 0.2rem;
+                }
+                .num {
+                    margin: 0 0.08rem
+                }
             }
 
             .cart-item-swipe{
                 width: 100%;
+                border: none;
+                .delete-button {
+                    box-sizing: content-box;
+                    padding-bottom: 0.1rem;
+                    padding-top: 0.1rem;
+                    border: none;
+                    // background: blue;
+                    align-items: center;
+                }
             }
         }
 

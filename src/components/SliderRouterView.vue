@@ -1,11 +1,12 @@
 <template>
     <div >
-        <router-view v-slot="{ Component, route }">
+        <!-- <router-view></router-view> -->
+        <router-view v-slot="{ Component, route }" >
             <transition :name="transitionName" @before-enter="beforeEnter" @after-leave="afterLeave">
-                <keep-alive inclue="virtualTaskStack">
+                <!-- <keep-alive inclue="virtualTaskStack"> -->
                     <component :is="Component" :key="route.meta.usePathKey ? route.path : undefined"
                         :class="{ ding: isAnimate}"  />
-                </keep-alive>
+                <!-- </keep-alive> -->
             </transition>
         </router-view>
 
@@ -43,19 +44,26 @@
 */
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 
+let store = useStore()
 let router = useRouter()
 let transitionName = ref()
+let rvRoute = ref(1)
 
 //  初始化虚拟任务栈
 let virtualTaskStack = ref([props.mainComponentName])
 const clearTask = () => { virtualTaskStack.value = [props.mainComponentName] }
 
-
 //  设置守卫
-router.beforeEach((to) => {
+router.beforeEach((to, from) => {
+    // console.log('before ', router.currentRoute.value)
+    store.commit('changeRouterType', 'push')
+
     transitionName.value = props.routerType
-    if(props.routeType == ROUTER_TYPE_PUSH){
+
+    // console.log(virtualTaskStack.value, props.routerType);
+    if(props.routerType === ROUTER_TYPE_PUSH){
         // 进栈
         virtualTaskStack.value.push(to.name)
     }else if(props.routerType == ROUTER_TYPE_BACK){
@@ -65,6 +73,8 @@ router.beforeEach((to) => {
     if(to.name === props.mainComponentName){
         clearTask()
     }
+
+
     //  不传递next,不用调用
     // next()
 })
@@ -107,7 +117,7 @@ const name = 'home'
 <style lang="scss" scoped>
 
 .ding {
-    position: relative;
+    position: absolute;
     left: 0;
     top: 0;
     width: 100%;
@@ -140,7 +150,7 @@ const name = 'home'
       }
 
       100% {
-          transform: translate(-50%, 0);
+          transform: translate(-100%, 0);
       }
   }
 
@@ -178,7 +188,7 @@ const name = 'home'
 
       100% {
           width: 100%;
-          transform: translate(50%, 0);
+          transform: translate(100%, 0);
       }
   }
 </style>

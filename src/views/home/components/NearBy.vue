@@ -1,7 +1,6 @@
 <template>
     <div class="shops">
         <slot></slot>
-
         <!-- 附近店铺区域 -->
         <!-- <router-link class="nearby_shop"
         v-for="(item,index) in shopList" :key="index"
@@ -39,19 +38,23 @@
             <div class="demo" style="margin: 0 auto" v-masonry gutter="15" percent-position="true" fit-width="true"
                 ref="waterfullEl">
                 <div v-masonry-tile class="card" v-for="item in waterfullList" :key="item.id">
-                    <router-link :to="'/goods/' + (shopId ? shopId : item.id ) " class="shop-info">
+                    <router-link :to="'/goods/' + (shopId ? shopId : item.id)" class="shop-info">
                         <div>
                             <img :src="item.imgUrl" alt="" />
                             <div class="goodsMsg">
                                 <div class="goodsName">
                                     <p>{{ item.title }}</p>
                                 </div>
-                                <!-- <div class="goodsDesc">{{ item.desc }}</div> -->
                                 <div class="price">
                                     <p>
                                         <strong>￥</strong> {{ item.price }}
-                                        <!-- <span>库存:{{ item.stock_num }}</span> -->
                                     </p>
+                                    <div class="goodsDesc">
+                                        <span>{{ item.sold_num || 0 }}人已购买</span>
+                                        <span>
+                                            {{ item.classify }}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -63,6 +66,7 @@
     </div>
 </template>
 
+
 <script setup>
 import { computed, ref, onMounted, onUpdated, nextTick } from 'vue'
 import { useStore } from 'vuex';
@@ -73,42 +77,47 @@ const store = useStore()
 const props = defineProps(
     {
         shopId: String,
-        waterfullList: Array
+        waterfullList: Array,
+        // bodyNode: Object,
     }
 )
-const emits = defineEmits(['loadData'])
+// const emits = defineEmits(['loadData'])
 
-// 触底加载
-document.addEventListener("scroll",
-    throttleFunc( (
-    (e) =>{
-        let preSltop = document.documentElement.scrollTop
-        return () => {
-            let { scrollHeight: sh, scrollTop: st, clientHeight: ch } = document.documentElement
-            if (sh - st - ch < 20 && preSltop < st) {
-                emits("loadData")
-            }
-            preSltop = st
-        }
-    })(), 600)
-)
 let waterfullEl = ref(null)
 let shopEl = ref(null)
+let bodyNode = props.bodyNode
+
+// onMounted(()=>{
+//     // console.log(bodyNode.value.scrollTop, 1);
+// // 触底加载
+//     if(!bodyNode) return
+//     bodyNode.value.addEventListener("scroll",
+//         throttleFunc( (
+//         (e) =>{
+//             // let preSltop = document.documentElement.scrollTop
+//             let preSltop = bodyNode.value.scrollTop
+//             return () => {
+//                 // let { scrollHeight: sh, scrollTop: st, clientHeight: ch } = document.documentElement
+//                 let { scrollHeight: sh, scrollTop: st, clientHeight: ch } = bodyNode.value
+//                 if (sh - st - ch < 20 && preSltop < st) {
+//                     emits("loadData")
+//                 }
+//                 preSltop = st
+//             }
+//         })(), 600)
+//     )
+// })
 
 onUpdated(() => {
     // 確定渲染后得到高度
-    nextTick( () => {
-        setTimeout(()=>{
-            // console.log(shopEl.value.style.height);
-            shopEl.value.style.height = Number( waterfullEl.value.style.height.slice(0, -2) ) + 50 + "px"
-            // console.log(shopEl.value.style.height);
+    nextTick(() => {
+        setTimeout(() => {
+            shopEl.value.style.height = Number(waterfullEl.value.style.height.slice(0, -2)) + 50 + "px"
         }, 500)
-    } )
+    })
 
 })
 
-onMounted(() => {
-})
 
 // -----商店列表及id
 let lis2 = ref([])
@@ -116,22 +125,16 @@ let { shopId } = props
 let shopList = computed(() =>
     store.getters.shops(shopId)
 )
-const getLiRef = (el, item)=>{
+const getLiRef = (el, item) => {
     lis2.value.push({
         el, item
     })
 }
 // ----------------
-
-
 </script>
 
 <style lang="scss" scoped>
-
-
-
-
-.loading{
+.loading {
     text-align: center;
 }
 
@@ -141,6 +144,7 @@ ul {
     background: #fff;
     // color: #1989fa;
 }
+
 li {
     visibility: hidden;
     position: absolute;
@@ -159,7 +163,6 @@ li {
 
 }
 
-//
 .shops {
     margin-top: 0.1rem;
     background-color: #fff;
@@ -170,36 +173,41 @@ li {
     width: 100%;
     height: 0.86rem;
     padding-top: 0.14rem;
-    .shop-picture  {
+
+    .shop-picture {
         display: inline-block;
         margin-left: 0.18rem;
         width: 0.56rem;
         height: 100%;
+
         img {
             height: 0.56rem;
             vertical-align: top;
         }
     }
-    .shop-info  {
+
+    .shop-info {
         vertical-align: top;
         display: inline-block;
         margin: 0 0 0 0.16rem;
         width: 2.67rem;
         height: 100%;
         border-bottom: 1px solid #f1f1f1;
+
         h3 {
             margin: 0;
             font-size: 0.16rem;
             line-height: 0.22rem;
         }
+
         .shop-text {
             font-size: 0.13rem;
             margin: 0.08rem 0;
-            // line-height: 0.08rem;
             span {
                 margin-right: 0.16rem;
             }
         }
+
         .shop-discount {
             font-size: 0.14rem;
             color: red;
@@ -208,64 +216,88 @@ li {
 }
 
 .shop {
-  .title {
-    margin: 0.14rem 0 0.14rem 0.18rem;
-    h2 {
-      font-size: 0.18rem;
-      color: #333;
-    }
-  }
-  .card {
-    width: 43vw;
-    background-color: #fff;
-    padding: 0.04rem;
-    box-shadow: 0 0.06rem 0.06rem rgba(208, 63, 167, 0.14);
-    border-radius: 0.08rem;
-    margin-bottom: 0.1rem;
-    img {
-      width: 100%;
-      display: block;
-      height: auto;
-    }
-    .goodsMsg {
-      .goodsName {
-        margin: 0.1rem 0;
-        p {
-          font-size: 0.14rem;
-          color: #333;
-          width: 100%;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          overflow: hidden;
+    .title {
+        margin: 0.14rem 0 0.14rem 0.18rem;
+
+        h2 {
+            font-size: 0.18rem;
+            color: #333;
         }
-      }
-      .goodsDesc {
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        overflow: hidden;
-        margin-bottom: 0.04rem;
-        color: #666;
-        font-size: 0.14rem;
-      }
-      .price {
-        p {
-          font-size: 0.16rem;
-          color: #ff4142;
-          margin: 0.03rem 0;
-          span {
-            font-size: 0.06rem;
-            color: #999;
-            margin-left: 0.3rem;
-            display: inline-block;
-          }
-          strong {
-            font-size: 0.14rem;
-            margin-left: 0.04rem;
-          }
-        }
-      }
     }
-  }
+
+    .card {
+        width: 43vw;
+        background-color: #fff;
+        padding: 0.04rem;
+        box-shadow: 0 0.06rem 0.06rem rgba(80, 182, 255, 0.24);
+        border-radius: 0.08rem;
+        margin-bottom: 0.1rem;
+
+        img {
+            width: 100%;
+            display: block;
+            height: auto;
+        }
+
+        .goodsMsg {
+            padding: 0.1rem 0 0.05rem;
+
+            .goodsName {
+                p {
+                    font-size: 0.14rem;
+                    line-height: 0.18rem;
+                    color: #333;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    overflow: hidden;
+                }
+            }
+
+            .goodsDesc {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.04rem 0.1rem;
+                font-size: 0.12rem;
+                background: #0389ff;
+                border-radius: 0.06rem;
+                position: relative;
+
+                span {
+                    color: #fff;
+                    display: inline-block;
+                }
+
+                & span:last-child {
+                    display: inline-block;
+                    border-radius: 0.1rem 0.06rem 0.06rem 0.1rem;
+                    height: 100%;
+                    width: 40%;
+                    position: absolute;
+                    right: 0;
+                    top: 0;
+                    display: inline-block;
+                    background: #ff0b00;
+                    background: #7232dd;
+                    color: rgb(248, 236, 236);
+                    text-align: center;
+                    line-height: 0.2rem;
+                }
+            }
+
+            .price {
+                p {
+                    font-size: 0.16rem;
+                    color: #ff4142;
+                    margin: 0.06rem 0;
+
+                    strong {
+                        font-size: 0.14rem;
+                        margin-left: 0.04rem;
+                    }
+                }
+            }
+        }
+    }
 }
 </style>

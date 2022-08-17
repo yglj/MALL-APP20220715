@@ -11,6 +11,9 @@
 <script>
 import { defineProps, defineEmits, toRefs, emits } from 'vue'
 import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
+
+
 
 export default {
     props: {
@@ -32,7 +35,7 @@ export default {
         'chgAddrStatus', 'doClick', 'goBack'
     ],
     setup(props, context) {
-
+        let store = useStore()
         let { title, doName, addrMangerState } = toRefs(props)
 
         const doClick = () => {
@@ -44,6 +47,8 @@ export default {
             context.emit('goBack')
             if( addrMangerState.value == 'list'){
                 router.go(-1)
+                store.commit('changeRouterType', 'back')
+
             }else {
                 // only setup script use defineEmits
                 context.emit('chgAddrStatus')

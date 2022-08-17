@@ -21,7 +21,9 @@
             <van-icon name="arrow-left" size="24" color="white" class="back-arrow" @click="leaveOrder"></van-icon>
             <van-col offset="6" span="8">确认订单</van-col>
         </van-row>
-        <van-row justify="space-between" class="head-addr" align="top">
+        <van-row justify="space-between" class="head-addr" align="top"
+        @click="$router.push({name: 'addr', params: {from: 'pay' }})"
+        >
             <van-col span="20">
                 <van-row class="addr-title"> 收货地址 </van-row>
                 <van-row class="addr-text"> {{ addrRef.area_name + addrRef.desc }} </van-row>
@@ -40,8 +42,8 @@
         <van-list class="list">
             <van-cell-group inset v-for="item in goodsRef" :key="item.id">
                 <van-cell>
-                    <van-row justify="space-between">
-                        <h3>{{ item.name }}</h3>
+                    <van-row justify="">
+                        <h3 style="width:100%">{{ item.name }}</h3>
                         <img :src="item.s_goods_photos[0].path" alt="">
                         <img :src="item.s_goods_photos[1].path" alt="">
                     </van-row>
@@ -53,7 +55,8 @@
             </van-cell-group>
         </van-list>
 
-        <van-submit-bar :price="orderTotalPrice" button-text="提交订单" @submit="addOrder(2)" />
+        <van-submit-bar :price="orderTotalPrice" button-text="提交订单" @submit="addOrder(2)"
+        button-color="#0091FF" />
     </div>
 
 </template>
@@ -156,9 +159,9 @@ const addOrder = (status, leave=false) => {
             updatedOrder(orderRef.value.id, addrRef.id, status)
             // await after router back
             setTimeout(()=>{
-                router.back()
+                prepareOrder.length > 1 ?  router.push('/cart') : router.push(`/goods/${prepareOrder[0].id}`)
+                store.commit('changeRouterType', 'back')
             }, leave ? 100 : 2000)
-            history.state.back == '/pay' && history.back()
         }
     })
 }
@@ -200,7 +203,7 @@ const onEdit = (item, index) => Toast('编辑地址:' + index)
 .head-addr {
     width: 3.4rem;
     margin: 0 auto;
-    height: 1.11rem;
+    // height: 1.11rem;
     position: absolute;
     top: 0.9rem;
     left: 0.18rem;

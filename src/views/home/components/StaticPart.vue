@@ -1,16 +1,15 @@
 <template>
     <div class="body">
 
-        <!-- 静态组件区域（分类组件） -->
-        <!-- <div class="phoneStatus"></div> -->
+        <!-- 静态组件区域（分类） -->
         <van-notice-bar scrollable mode="closeable" :text="oneWord" color="#1989fa" background="#ecf9ff" class="notice"
             v-if="noticeShow" />
 
-        <div class="address">
+        <!-- <div class="address">
             <img src="@/assets/addr.png" alt="" class="addr-btn">
             <span> {{ addr }}</span>
             <img src="@/assets/ben.png" alt="">
-        </div>
+        </div> -->
         <label :class="['search-box', {'search-active': searchAttch}]">
             <img src="@/assets/search.png" alt="">
             <input type="text" :placeholder="placeholder" class="search" @click="enterSearch">
@@ -45,22 +44,26 @@ import { HttpReq } from '@/tool/request'
 import { throttleFunc } from '@/tool/ty'
 
 let router = useRouter()
+
+// let noticeShow = ref(true)
+// let searchAttch = ref(false)
 const props = defineProps({
-    carouselImgs: Array
+    carouselImgs: Array,
+    noticeShow: Boolean,
+    searchAttch: Boolean
 })
-let addr =ref('北京理工大学国防科技园2号类10层')
 
 // 随意一句话
-let oneWord = ref('你他妈的真垃圾')
+let oneWord = ref('no b  , do something')
 async function getRandomWord(){
-    oneWord.value = await HttpReq("https://www.ooopn.com/tool/api/yan/api.php?type=text")
-    setInterval( async ()=>{
-        oneWord.value = await HttpReq("https://www.ooopn.com/tool/api/yan/api.php?type=text")
-    }, 30000)
+    // oneWord.value = await HttpReq("https://www.ooopn.com/tool/api/yan/api.php?type=text")
+    // setInterval( async ()=>{
+    //     oneWord.value = await HttpReq("https://www.ooopn.com/tool/api/yan/api.php?type=text")
+    // }, 60000)
 }
 getRandomWord()
 
-let placeholder = ref('山姆会员商铺店铺优惠品')
+let placeholder = ref('please seach goods')
 let shopList = reactive([
     { imgName: "超市", desc: "超市便利", imgUrl: "https://i.postimg.cc/FzmLt3sy/1.png", classify_id: 1921},
     { imgName: "菜市场", desc: "菜市场", imgUrl: "https://i.postimg.cc/bYHnxC33/2.png", classify_id: 1873 },
@@ -74,40 +77,18 @@ let shopList = reactive([
     { imgName: "红包", desc: "红包套餐", imgUrl: "https://i.postimg.cc/0Q16mDST/10.png", classify_id: 1875 },
 
 ])
-    // `http://www.dell-lee.com/imgs/vue3/${item.imgName}.png`
-// https://i.postimg.cc/FzmLt3sy/1.png
-// https://i.postimg.cc/0Q16mDST/10.png
-// https://i.postimg.cc/bYHnxC33/2.png
-// https://i.postimg.cc/QMT9H0Fg/3.png
-// https://i.postimg.cc/Vk5bcY1V/4.png
-// https://i.postimg.cc/kGct7GBk/5.png
-// https://i.postimg.cc/nzKX1rYC/6.png
-// https://i.postimg.cc/HkK8Yfks/7.png
-// https://i.postimg.cc/dtsy42fv/8.png
-// https://i.postimg.cc/tCBVf106/9.png
+
+// `http://www.dell-lee.com/imgs/vue3/${item.imgName}.png`
+
 
 // 自定义事件,进入搜索框
 const enterSearch = (el) => {
-    // console.log(el.target == document.activeElement);
     el.target == document.activeElement && router.push('/search')
 }
 
-let noticeShow = ref(true)
-let searchAttch = ref(false)
 
-// 吸顶
-document.addEventListener("scroll",
-    throttleFunc(() => {
-        let { scrollHeight: sh, scrollTop: st, clientHeight: ch } = document.documentElement
-        if (st > 50) {
-            noticeShow.value = false
-            searchAttch.value = true
-        }else {
-            noticeShow.value = true
-            searchAttch.value = false
-        }
-    }, 100)
-)
+
+
 
 
 </script>
@@ -195,9 +176,9 @@ document.addEventListener("scroll",
 
     .search-active {
         margin-top: 0;
-        height: 0.4rem;
+        height: 0.5rem;
         line-height: 0.4rem;
-        background: red;
+        background: #1c79c0;
         position: fixed;
         top: 0;
         left: 0;
@@ -235,6 +216,7 @@ document.addEventListener("scroll",
             div {
                 width: 0.48rem;
                 height: 0.17rem;
+                color: #000;
             }
         }
     }

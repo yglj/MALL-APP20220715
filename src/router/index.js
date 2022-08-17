@@ -27,22 +27,13 @@ const routes = [
     name: 'goods',
     component: () => import(/* webpackChunkName: "goods" */ '../views/goods/GoodsPage.vue'),
     beforeEnter: (to, from, next) => {
-      // ...
-      console.log(to.fullPath, "enter page");
       next()
     },
     beforeRouteUpdate(to, from, next) {
-      console.log(from.fullPath, "update page");
-      setTimeout(()=>{
-        next()
-      }, 1000)
+      next()
     },
     beforeRouteLeave(to, from, next) {
-      // ...
-      console.log(from.fullPath, "leave page");
-      setTimeout(() => {
-        next()
-      }, 1000)
+      next()
     }
   },
   {
@@ -66,11 +57,6 @@ const routes = [
     component: () => import(/* webpackChunkName: "pay" */ '../views/order/PayPage.vue')
   },
   {
-    path: '/demo1',
-    name: 'demo1',
-    component: () => import(/* webpackChunkName: "demo1" */ '../views/demo/DemoUI.vue')
-  },
-  {
     path: '/cart',
     name: 'cart',
     component: () => import(/* webpackChunkName: "cart" */ '../views/cart/CartPage.vue'),
@@ -90,14 +76,6 @@ const routes = [
     name: 'classify',
     component: () => import(/* webpackChunkName: "addr" */ '../views/home/components/Classify.vue')
   },
-  // {
-  //   path: '/about',
-  //   name: 'about',
-  //   // route level code-splitting
-  //   // this generates a separate chunk (about.[hash].js) for this route
-  //   // which is lazy-loaded when the route is visited.
-  //   component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  // }
 ]
 
 const router = createRouter({
@@ -108,10 +86,9 @@ const router = createRouter({
 // 登录拦截
 router.beforeEach((to, form, next)=>{
   let isLogin = sessionStorage.getItem("isLogin")
-  let authList = ['login', 'register']
-  // console.log(authList.includes(to.name), to.name);
+  let authList = ['/login', '/register']
   setTimeout( ()=>{
-    isLogin || authList.includes(to.name) ? next() : router.push('/login')
+    isLogin || authList.includes(to.path) ? next() : router.push('/login')
   }, 10)
 })
 

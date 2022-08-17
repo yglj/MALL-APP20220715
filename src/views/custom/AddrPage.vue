@@ -25,12 +25,12 @@
                     </div>
                     <van-row justify="start" align="bottom">
                         <van-col>
-                            <van-button type="danger" size="mini" color="#7232dd" plain
+                            <van-button type="primary" size="mini"  plain
                                 @click="setDefaultAddr(item.id)"> 设为默认地址
                             </van-button>
                         </van-col>
                         <van-col offset="4">
-                            <van-button type="danger" size="mini" color="#7232dd" plain @click="delAddress(item.id)"> 删除
+                            <van-button type="primary" size="mini"  plain @click="delAddress(item.id)"> 删除
                             </van-button>
                         </van-col>
                     </van-row>
@@ -52,6 +52,7 @@ import Header from '@/components/Header.vue'
 import AddrMangerPage from './AddrMangerPage.vue'
 import { Notify } from 'vant'
 import { useRoute, useRouter  } from 'vue-router'
+
 
 export default {
     setup() {
@@ -157,11 +158,14 @@ export default {
 .body {
     min-height: calc(100vh - 0.2rem);
     background: #f1f1f1;
+    overflow: hidden;
 }
 
 .addr-list {
     box-sizing: border-box;
     padding: 0.18rem 0.16rem;
+    height: calc(100vh - 0.64rem);
+    overflow-y: scroll;
     h2 {
         font-size: 0.16rem;
         font-weight: bold;

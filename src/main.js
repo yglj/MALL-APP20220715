@@ -3,8 +3,8 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 
-import './style/reset.css'
-import './style/base.scss'
+// import './style/reset.css'
+// import './style/base.scss'
 import 'normalize.css'
 
 import Vant from 'vant';
@@ -29,7 +29,3 @@ const Vue = createApp(App)
 .use(VueMasonryPlugin)
 .mount('#app')
 
-// Vue.config.devtools = true
-
-
-// 注册时可以配置额外的选项

@@ -1,11 +1,11 @@
 <template>
-    <div class="goods-ct">
+    <div class="goods-ct" ref="goodsNode">
         <van-nav-bar title="" left-text="" left-arrow :class="navBarStyle" @click-left="goBack">
             <template #right>
                 <div class="navbar-nav" v-if="navBarStyle.includes('active')">
-                    <span>商品</span>
+                    <!-- <span>商品</span>
                     <span>详情</span>
-                    <span>推荐</span>
+                    <span>推荐</span> -->
                 </div>
                 <router-link :to=" `/search?back=${route.fullPath}` ">
                     <van-icon name="search" size="21" />
@@ -58,11 +58,11 @@
         </van-tabs>
 
         <div class="holder"></div>
-        <van-action-bar>
+        <van-action-bar style="display:fixed; bottom:0; left:0;">
             <!-- popver 不被 root app 包裹 -->
 
-            <van-action-bar-icon icon="cart" text="购物车" :badge="cartCountById(cardRef.id)" color="#ee0a24" to="/cart" />
-            <van-action-bar-icon icon="star-o" text="收藏" color="#ff5000" />
+            <van-action-bar-icon icon="cart" text="购物车" :badge="cartCountById(cardRef.id)" :badge-props="{'color':'#136ad5'}" color="#136ad5" to="/cart" />
+            <van-action-bar-icon icon="star-o" text="收藏" color="#136ad5" />
             <van-action-bar-button type="warning" text="加入购物车" @click="addCart" color="#be99ff" />
             <van-popover v-model:show="showPopover" placement="top-end">
                 <van-grid square clickable :border="true" column-num="3" class="popContent">
@@ -77,17 +77,19 @@
                         </div>
                         <div class="pop-msg">
                             <!-- <van-button icon="plus" type="primary" size="small" @click="changeCartItem( 1)" /> -->
-                            <van-button icon="plus" type="primary" size="small"
+                            <van-button icon="plus" type="primary" size="mini" plain
                                 @click="immediatelyBuy( prepareOrder[0].num + 1)" />
                             <!-- <span class="pop-num"> {{ cartCountById(cardRef.id) }} </span> -->
                             <span class="pop-num"> {{ prepareOrder[0].num }} </span>
                             <!-- <van-button icon="minus" type="warning" size="small" @click="changeCartItem( -1)" -->
-                            <van-button icon="minus" type="warning" size="small"
+                            <van-button icon="minus" type="danger" size="mini" plain
                                 @click="immediatelyBuy( prepareOrder[0].num - 1)"
-                                color="linear-gradient(to right, #ff6034, #ee0a24)" />
+                                />
+                                <!-- color="linear-gradient(to right, #0dd3ff, #1c79c0)" -->
+                            <!-- color="linear-gradient(to right, #ff6034, #ee0a24)"  -->
                             <!-- <span class="pop-price"> ￥{{ cardRef.price * cartCountById(cardRef.id) }} </span> -->
                             <span class="pop-price"> ￥{{ cardRef.price * prepareOrder[0].num }} </span>
-                            <van-button type="primary" size="large" class="go-cart" color="#7232dd" @click="toPay">去结算
+                            <van-button type="primary" size="large" class="go-cart" color="#7232dd" @click="toPay" plain>去结算
                             </van-button>
                         </div>
                     </van-col>
@@ -99,7 +101,6 @@
                 </template>
             </van-popover>
         </van-action-bar>
-
     </div>
 </template>
 
@@ -111,19 +112,16 @@ import { ConfigProvider } from 'vant'
 import { scrollDoSome } from '@/tool/ty'
 import { useStore } from 'vuex'
 import { isNumeric } from 'vant/lib/utils';
+import { Toast } from 'vant'
 
 //  vuex
 let store = useStore()
-let cartCountById = computed((id) => store.getters['cart/cartCountById'] )
+let cartCountById = computed((id) => store.getters['cart/cartCountById'])
 onBeforeMount(
-    ()=>{
+    () => {
         store.dispatch('cart/getCartData', cardRef.id)
-        // console.log(store.state.cart.cartList);
     }
 )
-onMounted( ()=>{
-})
-
 
 // router
 let route = useRoute()
@@ -140,11 +138,15 @@ let cardRef = reactive({
 let navBarStyle = ref("goods-navbar")
 let activeName = ref("a")
 let showPopover = ref(false)
-let prepareOrder = computed(() => store.state.order.prepareOrder )
+let prepareOrder = computed(() => store.state.order.prepareOrder)
+let goodsNode = ref(null)
+
 //method
 const goBack = () => {
     // history.back()
     router.push("/")
+    store.commit('changeRouterType', 'back')
+
 }
 
 const changeCartItem = async (add) => {
@@ -173,6 +175,7 @@ const addCart = async () => {
     }else{
         res = await store.dispatch("cart/addCart", cardRef.id)
     }
+    Toast.success(`购物车，${res.msg}`);
     store.dispatch("cart/getCartData", cardRef.id)
 }
 
@@ -184,7 +187,7 @@ const getGoodsData = async () => {
     cardRef.id = res.id
     cardRef.title = res.name
     cardRef.desc = res.desc.split("#")
-    cardRef.price = res.price + ".00"
+    cardRef.price = Number(res.price).toFixed(2)
     cardRef.s_goods_photos = res.s_goods_photos
     cardRef.img_one = res.s_goods_photos[0].path
 }
@@ -208,10 +211,13 @@ const toPay = () => {
 //  called func
 getGoodsData()
 
-scrollDoSome( (sh, st, ch)=>{
-    navBarStyle.value = st >= 70 ? "goods-navbar goods-navbar-active" : "goods-navbar"
-}, 100)
+onMounted(() => {
+    scrollDoSome( (sh, st, ch)=>{
+        navBarStyle.value = st >= 70 ? "goods-navbar goods-navbar-active" : "goods-navbar"
+    }, 100, goodsNode)
+})
 
+// card style change
 const cardThemeVars = {
     cardPriceColor: "#f2270c",
     cardDescColor: "#aaa",
@@ -220,14 +226,16 @@ const cardThemeVars = {
     cardPriceFontSize: "0.3rem",
     cardPriceIntegerFontSize: "0.3rem",
 };
+
+
 </script>
 
 <style lang="scss" scoped>
 
 .goods-ct {
     height: calc(100vh - 0.2rem);
+    overflow-y: scroll;
 }
-
 
 .popContent{
     width: 100vw;
@@ -241,7 +249,7 @@ const cardThemeVars = {
     .pop-col-one {
         img {
             width: 0.8rem;
-            height: 1rem;
+            height: 100%;
         }
     }
     .pop-col-two {
@@ -253,6 +261,10 @@ const cardThemeVars = {
             font-size: 0.16rem;
             // line-height: 0.3rem;
         }
+        .pop-msg {
+            padding: 0 0rem;
+        }
+
         .pop-close{
             position: absolute;
             right: 0.05rem;
@@ -263,7 +275,7 @@ const cardThemeVars = {
             display: inline-block;
             font-size: 0.16rem;
             margin:  0 0.2rem;
-            line-height: 0.36rem;
+            // line-height: 0.36rem;
             vertical-align: bottom;
         }
         .pop-price {
@@ -271,13 +283,14 @@ const cardThemeVars = {
             margin: 0 0.2rem;
             display: inline-block;
             font-size: 0.18rem;
-            line-height: 0.36rem;
+            // line-height: 0.36rem;
             vertical-align: bottom;
         }
 
         .go-cart{
-            width: 100%;
+            width: 90%;
             height: 0.2rem;
+            margin-top: 0.1rem;
             border-radius: 0.05rem;
         }
     }
@@ -308,6 +321,7 @@ const cardThemeVars = {
     left: 0;
     background: transparent;
     transition: all 0.3s ease-in-out;
+    z-index: 100;
     &::after {
         border:none;
     }
@@ -368,7 +382,6 @@ const cardThemeVars = {
 
 .vtab-row {
     img {
-
         width: 100%;
         height: 3.75rem;
     }

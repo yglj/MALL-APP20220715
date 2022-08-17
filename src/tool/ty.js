@@ -1,4 +1,4 @@
-
+import { unref } from 'vue'
 
 function debounceFunc(fn, wait) {
     let timer = null;
@@ -14,6 +14,7 @@ function debounceFunc(fn, wait) {
     }
 }
 
+// 节流
 export function throttleFunc(fn, wait, a) {
     let time = 0, timer= null;
     return function () {
@@ -35,10 +36,11 @@ export function throttleFunc(fn, wait, a) {
 }
 
 // 滚动
-export const scrollDoSome = (cb, limit_time=300) => {
-    document.addEventListener("scroll",
+export const scrollDoSome = (cb, limit_time = 300, node = document) => {
+    if(!node) return false
+    unref(node).addEventListener("scroll",
         throttleFunc(() => {
-            let { scrollHeight: sh, scrollTop: st, clientHeight: ch } = document.documentElement
+            let { scrollHeight: sh, scrollTop: st, clientHeight: ch } = unref(node).documentElement || unref(node)
             cb(sh, st, ch)
         }, limit_time)
     )

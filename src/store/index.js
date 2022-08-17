@@ -17,7 +17,7 @@ export default createStore({
   },
   mutations: {
       changeRouterType(state, newRouterType){
-        console.log(newRouterType);
+        // console.log(newRouterType);
         state.routerType = newRouterType
       }
   },

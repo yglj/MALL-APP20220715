@@ -8,7 +8,8 @@
 
             <div class="order-item" v-for="(item, idx) in orderList" :key="idx" @click="toOrderDetail(item.id)">
                         <div class="order-item-l">
-                            <h3>{{ orderUUID(item.id) }}</h3>
+                            <!-- <h3>{{ orderUUID(item.id) }}</h3> -->
+                            <h3>订单号：{{ orderUUID(item.id) }}</h3>
                             <p>{{ orderTime(item.id) }}</p>
                             <div class="goods-imgs">
                                 <img :src="path" alt="" v-for="(path, idx) in getOrderImgs(item.id)" :key="idx">
@@ -24,7 +25,7 @@
                             <div class="goods-num">
                                 共{{ getOrderItemNum(item.id) }}件
                             </div>
-                            <van-button square type="danger"  size="small" text="删除"  @click="delOrder(item.id)"/>
+                            <van-button square type="primary"  size="small" text="删除"  @click="delOrder(item.id)"/>
                         </div>
 
             </div>
@@ -49,7 +50,8 @@ let getOrderStatus = computed((n) => store.getters['order/orderStatus'] )
 
 let orderUUID = computed( () => id => {
     let v = orderList.value.find( v => v.id == id )
-    return `${v.id}-${v.order_id}-${v.shops_id}-${v.user_id}-${v.addr_id}`
+    // return `${v.id}-${v.order_id}-${v.shops_id}-${v.user_id}-${v.addr_id}`
+    return `${v.order_id}-${v.shops_id}-${v.user_id}`
 })
 
 let orderGoodsInfo = computed(() => id => {
@@ -83,12 +85,13 @@ const toOrderDetail = (id) => {
 
 const delOrder = (id) => {
     Dialog.confirm({
-        message: 'del this order yes or no',
+        // message: 'del this order yes or no',
+        message: '确认删除订单？',
     }).then( async  () => {
         // on close
         let res = await store.dispatch({ type: 'order/deleteOrder' , order_id: id})
         await store.dispatch({ type: 'order/getOrderList' })
-        Notify({ type: 'success', message: res.msg });
+        Notify({ message: res.msg , background:"#1c79c0"});
     }).catch(() => {});
 }
 
@@ -107,7 +110,7 @@ const delOrder = (id) => {
     ,2)
     // let res = await HttpReq('/address', null
     // ,1)
-    console.log(res);
+    // console.log(res);
 })()
 
 
@@ -137,7 +140,7 @@ const delOrder = (id) => {
         margin: 0.16rem 0.18rem 0 0.18rem;
         padding: 0.16rem;
         width: 3.4rem;
-        height: 1.5rem;
+        // height: 1.5rem;
         background: #fff;
         border-radius: 4px;
         display: flex;
@@ -155,7 +158,7 @@ const delOrder = (id) => {
                 margin-top: 0.16rem;
                 img{
                     width: 0.6rem;
-                    height: 0.6rem;
+                    height: 0.8rem;
                     margin-right: 0.12rem;
                     background-color: yellow;
                 }

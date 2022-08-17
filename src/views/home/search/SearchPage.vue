@@ -114,7 +114,6 @@ const search =  async (v2v, args) =>{
     searchList.value = res.result.rows
     searchCount.value = res.result.count
 
-    // console.log(res);
 }
 
 const searchIpt = debounce(search, 1000)

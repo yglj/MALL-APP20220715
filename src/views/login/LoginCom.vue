@@ -33,7 +33,7 @@ import { ref, reactive, computed, toRefs } from 'vue'
 import { HttpReq } from '../../tool/request'
 import { useRouter } from 'vue-router';
 import { Dialog } from 'vant';
-import SliderCaptcha from '@/components/SliderCaptcha/SliderCaptcha.vue';
+import SliderCaptcha from '@/components/SliderCaptcha.vue';
 import { Toast } from 'vant'
 
 const router = useRouter()
@@ -131,10 +131,8 @@ async function handleClick(){
             sessionStorage.setItem("token", res.result.token)
             sessionStorage.setItem("isLogin", true)
             showCaptcha.value = true
-            // router.push('/')
         }else{
-            // upwd.tip = "用户名或密码不正确"
-            // tipColor = true
+
             Dialog({ message: '用户名或密码不正确' });
         }
     }

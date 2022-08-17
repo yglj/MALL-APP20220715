@@ -29,34 +29,7 @@ const emits = defineEmits(
     ['chgAddrStatus']
 )
 
-// const translateName = {
-//     "name": "收件人姓名",
-//     "phone": "手机号",
-//     "area_name": "省市区域",
-//     "desc": "详细地址",
-// }
 
-// let addr = {
-//     "name": "如xxxx",
-//     "phone": "如137xxxx1111",
-//     "area_name": "input 省市区域",
-//     "desc": "input 详细地址",
-// }
-
-
-
-// area: "150102"
-// area_name: "内蒙古自治区 呼和浩特市 新城区"
-// createdAt: "2022-08-03T03:34:54.000Z"
-// default_set: "1"
-// desc: "盘龙城41号222"
-// id: 2380
-// name: "韩艳"
-// phone: "15012345678"
-// post_code: null
-// status: "1"
-// updatedAt: "2022-08-03T03:34:55.000Z"
-// user_id: 1887
 const { addrMangerState, currentAddr } = props
 let addr = addrMangerState == 'edit' ? {
     addressDetail: currentAddr.desc,
@@ -80,15 +53,7 @@ let addr = addrMangerState == 'edit' ? {
 const searchResult = ref([]);
 
 const onSave = async (saveData) => {
-    // {
-    //     "name": "hahaha",
-    //         "phone": "18812345678",
-    //             "password": "xxxxxxx",
-    //                 "area": "2,52,501",
-    //                     "area_name": "北京省市辖区西城区",
-    //                         "desc": "详细地址",
-    //                             "post_code": "100000"
-    // }
+
     let addr = {
         id: currentAddr && currentAddr.id,
         name: saveData.name,

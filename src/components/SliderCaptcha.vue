@@ -45,32 +45,27 @@ onMounted(()=>{
             emits('captchaFail')
         },
         verify(){
-            // console.log("默认行为");
+            // 默认行为
             return true
         }
     })
 
-    // captcha.addEventListener("touchstart", ()=>{
-    //     console.log("touchstart");
-    // }, { passive: false })
 })
 
 </script>
 
 <style lang="scss" scoped>
 
-
-
-
 button {
     border: none;
-    outline: solid 1px blue;
+    outline: solid 1px #0dd3ff;
     margin: 0 0.2rem 0.2rem;
     padding: 0.1rem;
-    border: 1px solid #345;
+    border: 1px solid #0389ff;
     width: 1rem;
-    background: rgb(226, 232, 242);
-    color: #111;
+    background: #0389ff;
+    color: #fff;
+    font-weight: normal;
 }
 
 .captcha-ct {
@@ -82,20 +77,36 @@ button {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    border: 1px dashed orangered;
+    border: 1px dashed #1c79c0;
         /* fallback for old browsers */
-        background: -webkit-linear-gradient(to right, rgb(198, 255, 221), rgb(251, 215, 134), rgb(247, 121, 125));
+        // background: -webkit-linear-gradient(to right, rgb(198, 255, 221), rgb(251, 215, 134), rgb(247, 121, 125));
         /* Chrome 10-25, Safari 5.1-6 */
-        background: linear-gradient(to right, rgb(198, 255, 221), rgb(251, 215, 134), rgb(247, 121, 125));
-        /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        // background: linear-gradient(to right, rgb(198, 255, 221), rgb(251, 215, 134), rgb(247, 121, 125));
+        /* W3C, IE 10+/ Edge, Frefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: #fdfdfd;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    border-radius: 0.1rem;
 
     h2 {
         font-size: 0.2rem;
-        margin-bottom: 0.1rem;
+        margin-bottom: 0.2rem;
+    }
+    #captcha {
+        height: 2rem;
+        position: relative;
+        &::after {
+            display: block;
+            content: '请稍稍等候...';
+            position: absolute;
+            transform: translate(-50%, -50%);
+            left: 50%;
+            top: 40%;
+            font-size: 0.2rem;
+            z-index: -1;
+        }
     }
 }
 .mask {

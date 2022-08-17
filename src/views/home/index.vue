@@ -1,15 +1,13 @@
 <template>
-    <div>
+    <div class="body" ref="bodyNode">
 
         <div class="wrapper">
-            <!-- this is index
-            静态组件
-            分类组件
-            商铺组件
-            容器组件（其他组件，非home私有） -->
-            <StaticPart :carouselImgs="carouselImgs"></StaticPart>
 
-            <NearBy :waterfullList="waterfullList" @loadData="loadRecommend">
+            <StaticPart :carouselImgs="carouselImgs"
+            :noticeShow="noticeShow" :searchAttch="searchAttch"
+            ></StaticPart>
+
+            <NearBy :waterfullList="waterfullList" @loadData="loadRecommend" :bodyNode="bodyNode">
                 <template v-slot:default>
                     <div>
                         <h2 class="nearby_text">热门推荐</h2>
@@ -23,15 +21,21 @@
 </template>
 
 <script setup>
+/*
+静态组件
+热门推荐
+*/
 import StaticPart from './components/StaticPart.vue';
 import NearBy from './components/NearBy.vue';
 import Docker from '../../components/Docker.vue';
 import { HttpReq } from '@/tool/request';
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Toast } from 'vant'
+import { throttleFunc } from '@/tool/ty'
 
 let carouselImgs = ref([])
 let waterfullList = ref([])
+let bodyNode = ref(null)
 
 // 轮播图图片
 const getCarousel = async () => {
@@ -56,7 +60,8 @@ const getRecommend = ((limit) => {
                     let { id, name:title , price } = val
                     let imgUrl = val.s_goods_photos[0].path
                     let classify = val.s_classify.name
-                    return  { id, title, price, imgUrl, classify }
+                    let sold_num = val.sold_num
+                    return  { id, title, price, imgUrl, classify, sold_num }
                 })
             }else{
                 res = await HttpReq('/goods/3818', null , 1)
@@ -81,9 +86,50 @@ const loadRecommend = () => {
     getRecommend()
 }
 
+let noticeShow = ref(true)
+let searchAttch = ref(false)
+onMounted(()=>{
+// 触底加载
+    // if(!bodyNode) return
+    bodyNode.value.addEventListener("scroll",
+        throttleFunc( (
+        (e) =>{
+            // let preSltop = document.documentElement.scrollTop
+            let preSltop = bodyNode.value.scrollTop
+            return () => {
+                // let { scrollHeight: sh, scrollTop: st, clientHeight: ch } = document.documentElement
+                let { scrollHeight: sh, scrollTop: st, clientHeight: ch } = bodyNode.value
+                if (sh - st - ch < 20 && preSltop < st) {
+                    // emits("loadData")
+                    loadRecommend()
+                }
+                preSltop = st
+            }
+        })(), 600)
+    )
+
+    // 吸顶
+    bodyNode.value.addEventListener("scroll",
+        throttleFunc(() => {
+            let { scrollHeight: sh, scrollTop: st, clientHeight: ch } = bodyNode.value
+            if (st > 50) {
+                noticeShow.value = false
+                searchAttch.value = true
+            }else {
+                noticeShow.value = true
+                searchAttch.value = false
+            }
+        }, 100)
+    )
+})
+
 </script>
 
 <style lang="scss" scoped>
+    .body {
+        // height: calc(100vh - 0.2rem);
+        overflow-y: scroll;
+    }
 
     :root {
         --van-toast-text-color: #ffa;
